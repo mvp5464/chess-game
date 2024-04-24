@@ -14,6 +14,7 @@ export class Game {
   public player2: WebSocket;
   public board: Chess;
   private startTime: Date;
+  private moveCount = 0;
 
   // Whenever the game is start this will be the state and msgs
   constructor(player1: WebSocket, player2: WebSocket) {
@@ -45,16 +46,26 @@ export class Game {
     // Validate the type of move using zod
     // 1 Is it this users move (by chess.js)
     // 2 Is the move valid (by chess.js)
-    if (this.board.move.length % 2 === 0 && socket !== this.player1) {
+    console.log(26);
+    if (this.moveCount % 2 === 0 && socket !== this.player1) {
+      console.log("this.board.moves().length % 2");
+      console.log(this.moveCount % 2);
+      console.log("one");
       return; // If the player1 is tring to move 2 turns it will show an error (chess.js will check this in below move)
     }
-    if (this.board.move.length % 2 === 1 && socket !== this.player2) {
+    if (this.moveCount % 2 === 1 && socket !== this.player2) {
+      console.log("this.board.moves().length % 2");
+      console.log(this.moveCount % 2);
+      console.log("two");
       return; // If the player2 is tring to move 2 turns it will show an error
     }
 
     try {
-      this.board.move(move);
+      console.log(27);
+      this.board.move(move); // If move is valide then change/update the move
+      console.log(278);
     } catch (e) {
+      console.log(e);
       return;
     }
 
@@ -64,7 +75,7 @@ export class Game {
     // Check if the game is over
     if (this.board.isGameOver()) {
       // Send the gameover message to both the player
-      this.player1.emit(
+      this.player1.send(
         JSON.stringify({
           type: GAME_OVER,
           payload: {
@@ -72,7 +83,7 @@ export class Game {
           },
         })
       );
-      this.player2.emit(
+      this.player2.send(
         JSON.stringify({
           type: GAME_OVER,
           payload: {
@@ -83,15 +94,15 @@ export class Game {
       return;
     }
     // If game is not over then move
-    if (this.board.move.length % 2 === 0) {
-      this.player2.emit(
+    if (this.moveCount % 2 === 0) {
+      this.player2.send(
         JSON.stringify({
           type: MOVE,
           payload: move,
         })
       );
     } else {
-      this.player1.emit(
+      this.player1.send(
         JSON.stringify({
           type: MOVE,
           paylod: move,
@@ -100,6 +111,7 @@ export class Game {
     }
     //
     // Send the update board to both the players
+    this.moveCount++;
 
     // ADDING A TIME LOGIC IS REMAINING ( IF THE TIME IS UP FOR ANY PLAYER THEN THE GAME ENDS )
   }
