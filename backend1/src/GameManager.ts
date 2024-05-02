@@ -59,7 +59,7 @@ export class GameManager {
         // Make a move and update it (makeMove function)
         if (game) {
           console.log(25);
-          game.makeMove(socket, message.move);
+          game.makeMove(socket, message.payload.move);
         }
       }
     });

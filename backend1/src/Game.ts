@@ -105,7 +105,7 @@ export class Game {
       this.player1.send(
         JSON.stringify({
           type: MOVE,
-          paylod: move,
+          payload: move,
         })
       );
     }
